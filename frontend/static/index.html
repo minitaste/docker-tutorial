@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo List</title>
+  </head>
+  <body>
+    <h1>Todo List</h1>
+    <input type="text" id="newItem" placeholder="Enter a new task" />
+    <button onclick="addItem()">Add</button>
+    <ul id="list"></ul>
+    
+    <script>
+      const API_URL = "http://localhost:8000";
+
+      const fetchTodos = async () => {
+        const response = await fetch(`${API_URL}/todos`);
+        const todos = await response.json();
+        const list = document.getElementById("list");
+        
+        // 🛠 Clear list before adding new items to avoid duplicates
+        list.innerHTML = "";
+        
+        todos.forEach((todo) => {
+          const li = document.createElement("li");
+          li.textContent = todo.content;
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.textContent = "Delete";
+          deleteBtn.onclick = () => deleteItem(todo.id);
+          
+          // 🛠 Append delete button inside the list item
+          li.appendChild(deleteBtn);
+          list.appendChild(li);
+        });
+      };
+
+      const addItem = async () => {
+        const input = document.getElementById("newItem");
+        const content = input.value.trim();
+        
+        if (!content) return alert("Please enter a task!");
+
+        const response = await fetch(`${API_URL}/todos`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content }),
+        });
+
+        if (response.ok) {
+          input.value = "";
+          fetchTodos();
+        } else {
+          alert("Failed to add item!");
+        }
+      };
+
+      const deleteItem = async (id) => {
+        const response = await fetch(`${API_URL}/todos/${id}`, {
+          method: "DELETE",
+        });
+
+        if (response.ok) {
+          fetchTodos();
+        } else {
+          alert("Failed to delete item!");
+        }
+      };
+
+      fetchTodos();
+    </script>
+  </body>
+</html>

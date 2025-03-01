@@ -1,0 +1,29 @@
+services:
+  backend:
+    image: docker-tutorial-backend
+    pull_policy: never
+    container_name: docker-tutorial-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: runner
+    ports:
+      - 8000:8000
+
+  frontend:
+    image: docker-tutorial-frontend
+    pull_policy: never
+    container_name: docker-tutorial-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+
+  redis:
+    image: redis
+    container_name: redis
+    volumes:
+     - redis-data:/data
+volumes:
+  redis-data:  
